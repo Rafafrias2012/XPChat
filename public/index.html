@@ -34,6 +34,7 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="/speakjs/speakClient.js"></script>
   <script>
+    const sanitizeHtml = require('sanitize-html');
     let socket = io();
     let nicknameInput = document.getElementById('nickname');
     let roomidInput = document.getElementById('roomid');
