@@ -71,7 +71,7 @@
 
     socket.on('newMessage', (data) => {
       let message = `${data.nickname}: ${data.message}`;
-      speak(data.message);
+      speak.play(data.message);
       addMessage(message);
     });
 
