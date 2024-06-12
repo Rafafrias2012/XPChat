@@ -1,0 +1,117 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>XPbox</title>
+  <link rel="stylesheet" href="https://botoxparty.github.io/XP.css/XP.css">
+</head>
+<body>
+  <div class="xp-window" id="xpbox">
+    <div class="xp-header">
+      <h1>XPbox</h1>
+    </div>
+    <div class="xp-content">
+      <div class="xp-login">
+        <input type="text" id="nickname" placeholder="Nickname">
+        <input type="text" id="roomid" placeholder="Room ID" value="default">
+        <button id="login-btn">Login</button>
+      </div>
+      <div class="xp-chat" id="chat-log">
+        <ul id="messages"></ul>
+      </div>
+      <div class="xp-input">
+        <input type="text" id="message-input" placeholder="Type a message...">
+        <button id="send-btn">Send</button>
+      </div>
+      <div class="xp-buddy-list" id="buddy-list">
+        <h2>Buddy List</h2>
+        <ul id="buddies"></ul>
+        <p id="buddy-count">0 buddies online</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let socket = io();
+    let nicknameInput = document.getElementById('nickname');
+    let roomidInput = document.getElementById('roomid');
+    let loginBtn = document.getElementById('login-btn');
+    let messageInput = document.getElementById('message-input');
+    let sendBtn = document.getElementById('send-btn');
+    let chatLog = document.getElementById('chat-log');
+    let buddyList = document.getElementById('buddy-list');
+    let buddyCount = document.getElementById('buddy-count');
+
+    loginBtn.addEventListener('click', () => {
+      let nickname = nicknameInput.value;
+      let roomid = roomidInput.value;
+      socket.emit('login', { nickname, roomid });
+    });
+
+    sendBtn.addEventListener('click', () => {
+      let message = messageInput.value;
+      socket.emit('sendMessage', { message });
+      messageInput.value = '';
+    });
+
+    socket.on('userJoined', (nickname) => {
+      let message = `${nickname} has joined the room.`;
+      addMessage(message);
+      updateBuddyList();
+    });
+
+    socket.on('userLeft', (nickname) => {
+      let message = `${nickname} has left the room.`;
+      addMessage(message);
+      updateBuddyList();
+    });
+
+    socket.on('newMessage', (data) => {
+      let message = `${data.nickname}: ${data.message}`;
+      addMessage(message);
+    });
+
+    socket.on('userUpdated', (nickname) => {
+      updateBuddyList();
+    });
+
+    socket.on('newImage', (data) => {
+      let message = `<img src="${data.url}" alt="${data.nickname}'s image">`;
+      addMessage(message);
+    });
+
+    socket.on('newVideo', (data) => {
+      let message = `<video src="${data.url}" alt="${data.nickname}'s video"></video>`;
+      addMessage(message);
+    });
+
+    socket.on('newYouTube', (data) => {
+      let message = `<iframe src="https://www.youtube.com/embed/${data.url}" frameborder="0" allowfullscreen></iframe>`;
+      addMessage(message);
+    });
+
+    function addMessage(message) {
+      let messageElement = document.createElement('li');
+      messageElement.textContent = message;
+      chatLog.appendChild(messageElement);
+    }
+
+    function updateBuddyList() {
+      let buddies = [];
+      for (let id in users) {
+        if (users[id].roomid === roomidInput.value) {
+          buddies.push(users[id].nickname);
+        }
+      }
+      buddyList.innerHTML = '';
+      buddies.forEach((buddy) => {
+        let buddyElement = document.createElement('li');
+        buddyElement.textContent = buddy;
+        buddyList.appendChild(buddyElement);
+      });
+      buddyCount.textContent = `${buddies.length} buddies online`;
+    }
+  </script>
+</body>
+</html>
