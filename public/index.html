@@ -76,10 +76,19 @@
     });
 
     socket.on('newMessage', (data) => {
-      let message = `${data.nickname}: ${data.message}`;
-      speak.play(data.message);
-      addMessage(message);
-    });
+  let message = `${data.nickname}: ${data.message}`;
+  let sanitizedMessage = sanitizeHtml(message, {
+    allowedTags: ['b', 'i', 'u', 'a', 'img', 'video', 'iframe'],
+    allowedAttributes: {
+      a: ['href'],
+      img: ['src', 'alt'],
+      video: ['src'],
+      iframe: ['src', 'frameborder', 'allowfullscreen']
+    }
+  });
+  speak.play(data.message);
+  addMessage(sanitizedMessage);
+});
 
     socket.on('userUpdated', (nickname) => {
       updateBuddyList();
