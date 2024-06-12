@@ -48,29 +48,29 @@ io.on('connection', (socket) => {
   });
 
   socket.on('command', (data) => {
-    let user = users[socket.id];
-    let command = data.command;
-    let args = data.args;
-    switch (command) {
-      case '/name':
-        user.nickname = args[0];
-        io.to(user.roomid).emit('userUpdated', user.nickname);
-        break;
-      case '/color':
-        user.color = args[0];
-        io.to(user.roomid).emit('userUpdated', user.nickname);
-        break;
-      case '/image':
-        io.to(user.roomid).emit('newImage', { nickname: user.nickname, url: args[0] });
-        break;
-      case '/video':
-        io.to(user.roomid).emit('newVideo', { nickname: user.nickname, url: args[0] });
-        break;
-      case '/YouTube':
-        io.to(user.roomid).emit('newYouTube', { nickname: user.nickname, url: args[0] });
-        break;
-    }
-  });
+  let user = users[socket.id];
+  let command = data.command;
+  let args = data.args;
+  switch (command) {
+    case 'name':
+      user.nickname = args[0];
+      io.to(user.roomid).emit('userUpdated', user.nickname);
+      break;
+    case 'color':
+      user.color = args[0];
+      io.to(user.roomid).emit('userUpdated', user.nickname);
+      break;
+    case 'image':
+      io.to(user.roomid).emit('newImage', { nickname: user.nickname, url: args[0] });
+      break;
+    case 'video':
+      io.to(user.roomid).emit('newVideo', { nickname: user.nickname, url: args[0] });
+      break;
+    case 'YouTube':
+      io.to(user.roomid).emit('newYouTube', { nickname: user.nickname, url: args[0] });
+      break;
+  }
+});
 });
 
 server.listen(3000, () => {
